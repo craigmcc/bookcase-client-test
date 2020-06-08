@@ -41,13 +41,6 @@
     <!-- Dependencies -->
     <dependencies>
 
-        <!-- Bean Validation APIs -->
-<!--
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
--->
 
         <!-- JUnit 4 -->
         <dependency>

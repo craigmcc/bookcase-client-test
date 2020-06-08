@@ -28,12 +28,12 @@ public class DevModeClient extends AbstractClient {
     // Instance Variables ----------------------------------------------------
 
     private final WebTarget depopulateTarget = getBaseTarget()
-            .path("devmode")
-            .path("depopulate");
+            .path("/devmode")
+            .path("/depopulate");
 
     private final WebTarget populateTarget = getBaseTarget()
-            .path("devmode")
-            .path("populate");
+            .path("/devmode")
+            .path("/populate");
 
     // Public Methods --------------------------------------------------------
 

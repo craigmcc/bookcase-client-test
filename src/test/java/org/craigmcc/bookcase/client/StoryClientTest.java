@@ -18,7 +18,6 @@ package org.craigmcc.bookcase.client;
 import org.craigmcc.bookcase.exception.BadRequest;
 import org.craigmcc.bookcase.exception.NotFound;
 import org.craigmcc.bookcase.model.Anthology;
-import org.craigmcc.bookcase.model.Author;
 import org.craigmcc.bookcase.model.Book;
 import org.craigmcc.bookcase.model.Story;
 import org.junit.Before;
@@ -32,14 +31,13 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
 
-public class AnthologyClientTest extends AbstractClientTest {
+public class StoryClientTest extends AbstractClientTest {
 
     // Instance Variables ----------------------------------------------------
 
     private final AnthologyClient anthologyClient = new AnthologyClient();
-    private final AuthorClient authorClient = new AuthorClient();
+    private final BookClient bookClient = new BookClient();
     private final StoryClient storyClient = new StoryClient();
 
     // Lifecycle Methods -----------------------------------------------------
@@ -65,27 +63,20 @@ public class AnthologyClientTest extends AbstractClientTest {
             return;
         }
 
-        List<Anthology> anthologies = anthologyClient.findAll();
-        assertThat(anthologies.size(), is(greaterThan(0)));
+        List<Story> stories = storyClient.findAll();
+        assertThat(stories.size(), is(greaterThan(0)));
 
-        for (Anthology anthology : anthologies) {
-
-            // Test data should not have any anthologies with no stories
-            List<Story> stories = storyClient.findByAnthologyId(anthology.getId());
-            assertThat(stories.size(), greaterThan(0));
+        for (Story story : stories) {
 
             // Delete and verify we can no longer retrieve it
-            anthologyClient.delete(anthology.getId());
+            storyClient.delete(story.getId());
             assertThrows(NotFound.class,
-                    () -> anthologyClient.find(anthology.getId()));
-
-            // Delete should have cascaded to stories
-            assertThat(storyClient.findByAnthologyId(anthology.getId()).size(), is(0));
+                    () -> storyClient.find(story.getId()));
 
         }
 
-        // We should have deleted all anthologies
-        assertThat(anthologyClient.findAll().size(), is(0));
+        // We should have deleted all Storys
+        assertThat(storyClient.findAll().size(), is(0));
 
     }
 
@@ -97,7 +88,7 @@ public class AnthologyClientTest extends AbstractClientTest {
         }
 
         assertThrows(NotFound.class,
-                () -> anthologyClient.delete(Long.MAX_VALUE));
+                () -> storyClient.delete(Long.MAX_VALUE));
 
     }
 
@@ -105,17 +96,17 @@ public class AnthologyClientTest extends AbstractClientTest {
 
     @Test
     public void findHappy() throws Exception {
-        List<Anthology> anthologies = anthologyClient.findAll();
-        for (Anthology anthology : anthologies) {
-            Anthology found = anthologyClient.find(anthology.getId());
-            assertThat(found.equals(anthology), is(true));
+        List<Story> stories = storyClient.findAll();
+        for (Story story : stories) {
+            Story found = storyClient.find(story.getId());
+            assertThat(found.equals(story), is(true));
         }
     }
 
     @Test
     public void findNotFound() throws Exception {
         assertThrows(NotFound.class,
-                () -> anthologyClient.find(Long.MAX_VALUE));
+                () -> storyClient.find(Long.MAX_VALUE));
     }
 
     // findAll() tests
@@ -123,16 +114,28 @@ public class AnthologyClientTest extends AbstractClientTest {
     @Test
     public void findAllHappy() throws Exception {
 
-        List<Anthology> anthologies = anthologyClient.findAll();
-        assertThat(anthologies, is(notNullValue()));
-        assertThat(anthologies.size(), is(greaterThan(0)));
+        List<Story> stories = storyClient.findAll();
+        assertThat(stories.size(), is(greaterThan(0)));
 
-        String previousTitle = null;
+    }
+
+    // findByAnthologyId() tests
+
+    public void findByAnthologyIdHappy() throws Exception {
+
+        List<Anthology> anthologies = anthologyClient.findAll();
         for (Anthology anthology : anthologies) {
-            if (previousTitle != null) {
-                assertThat(anthology.getTitle(), is(greaterThan(previousTitle)));
+            List<Story> stories = storyClient.findByAnthologyId(anthology.getId());
+            if (stories.size() > 0) {
+                Integer previousOrdinal = null;
+                for (Story story : stories) {
+                    if (previousOrdinal != null) {
+                        assertThat(story.getOrdinal(), is(greaterThan(previousOrdinal)));
+                    }
+                    previousOrdinal = story.getOrdinal();
+                }
             }
-            previousTitle = anthology.getTitle();
+
         }
 
     }
@@ -146,17 +149,13 @@ public class AnthologyClientTest extends AbstractClientTest {
             return;
         }
 
-        Anthology anthology = newAnthology();
-        Anthology inserted = anthologyClient.insert(anthology);
+        Story Story = newStory();
+        Story inserted = storyClient.insert(Story);
 
         assertThat(inserted.getId(), is(notNullValue()));
         assertThat(inserted.getVersion(), is(0));
-        try {
-            Anthology found = anthologyClient.find(inserted.getId());
-            assertThat(found.equals(inserted), is(true));
-        } catch (Exception e) {
-            fail("Should not have thrown an exception: " + e.getMessage());
-        }
+        Story found = storyClient.find(inserted.getId());
+        assertThat(found.equals(inserted), is(true));
 
     }
 
@@ -168,27 +167,33 @@ public class AnthologyClientTest extends AbstractClientTest {
         }
 
         // Completely empty instance
-        final Anthology anthology0 = new Anthology();
+        final Story story0 = new Story();
         assertThrows(BadRequest.class,
-                () -> anthologyClient.insert(anthology0));
+                () -> storyClient.insert(story0));
 
-        // Missing authorId field
-        final Anthology anthology1 = newAnthology();
-        anthology1.setAuthorId(null);
+        // Missing bookId field
+        final Story story1 = newStory();
+        story1.setBookId(null);
         assertThrows(BadRequest.class,
-                () -> anthologyClient.insert(anthology1));
+                () -> storyClient.insert(story1));
 
-        // Invalid authorId field
-        final Anthology anthology2 = newAnthology();
-        anthology2.setAuthorId(Long.MAX_VALUE);
+        // Invalid bookId field
+        final Story story2 = newStory();
+        story2.setBookId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> anthologyClient.insert(anthology1));
+                () -> storyClient.insert(story2));
 
-        // Missing title field
-        final Anthology anthology3 = newAnthology();
-        anthology3.setTitle(null);
+        // Missing anthologyId field
+        final Story story3 = newStory();
+        story3.setAnthologyId(null);
         assertThrows(BadRequest.class,
-                () -> anthologyClient.insert(anthology3));
+                () -> storyClient.insert(story3));
+
+        // Invalid anthologyId field
+        final Story story4 = newStory();
+        story4.setAnthologyId(Long.MAX_VALUE);
+        assertThrows(BadRequest.class,
+                () -> storyClient.insert(story4));
 
     }
 
@@ -210,24 +215,24 @@ public class AnthologyClientTest extends AbstractClientTest {
         }
 
         // Get original entity
-        Anthology original = findFirstAnthologyByTitle("by");
+        Story original = findFirstStory();
 
         // Update this entity
-        Anthology anthology = original.clone();
+        Story Story = original.clone();
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             /* Ignore */;
         }
-        anthology.setTitle(anthology.getTitle() + " Updated");
-        Anthology updated = anthologyClient.update(anthology);
+        Story.setOrdinal(Story.getOrdinal() + 100);
+        Story updated = storyClient.update(Story);
 
         // Validate this entity
-        assertThat(updated.getId(), is(anthology.getId()));
-        assertThat(updated.getPublished(), is(anthology.getPublished()));
+        assertThat(updated.getId(), is(Story.getId()));
+        assertThat(updated.getPublished(), is(Story.getPublished()));
         assertThat(updated.getUpdated(), is(greaterThan(original.getUpdated())));
         assertThat(updated.getVersion(), is(greaterThan(original.getVersion())));
-        assertThat(updated.getTitle(), is(original.getTitle() + " Updated"));
+        assertThat(updated.getOrdinal(), is(original.getOrdinal() + 100));
 
     }
 
@@ -239,7 +244,7 @@ public class AnthologyClientTest extends AbstractClientTest {
         }
 
         // Get original entity
-        Anthology original = findFirstAnthologyByTitle(" by ");
+        Story original = findFirstStory();
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -247,27 +252,33 @@ public class AnthologyClientTest extends AbstractClientTest {
         }
 
         // Completely empty instance
-        final Anthology anthology0 = new Anthology();
+        final Story story0 = new Story();
         assertThrows(NotFound.class,
-                () -> anthologyClient.update(anthology0));
+                () -> storyClient.update(story0));
 
-        // Missing authorId field
-        final Anthology anthology1 = original.clone();
-        anthology1.setAuthorId(null);
+        // Missing bookId field
+        final Story story1 = original.clone();
+        story1.setBookId(null);
         assertThrows(BadRequest.class,
-                () -> anthologyClient.update(anthology1));
+                () -> storyClient.update(story1));
 
-        // Invalid authorId field
-        final Anthology anthology2 = original.clone();
-        anthology2.setAuthorId(Long.MAX_VALUE);
+        // Invalid bookId field
+        final Story story2 = original.clone();
+        story2.setBookId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> anthologyClient.update(anthology1));
+                () -> storyClient.update(story2));
 
-        // Missing title field
-        final Anthology anthology3 = original.clone();
-        anthology3.setTitle(null);
+        // Missing anthologyId field
+        final Story story3 = original.clone();
+        story3.setAnthologyId(null);
         assertThrows(BadRequest.class,
-                () -> anthologyClient.update(anthology3));
+                () -> storyClient.update(story3));
+
+        // Invalid anthologyId field
+        final Story story4 = original.clone();
+        story4.setAnthologyId(Long.MAX_VALUE);
+        assertThrows(BadRequest.class,
+                () -> storyClient.update(story4));
 
     }
 
@@ -281,21 +292,24 @@ public class AnthologyClientTest extends AbstractClientTest {
 
     // Private Methods -------------------------------------------------------
 
-    private Anthology findFirstAnthologyByTitle(String title) throws Exception {
+    private Anthology findFirstAnthology() throws Exception {
         List<Anthology> anthologies = anthologyClient.findAll();
-        assertThat(anthologies.size(), is(greaterThan(0)));
         return anthologies.get(0);
     }
 
-    private Anthology newAnthology() throws Exception {
-        List<Author> authors = authorClient.findAll();
-        assertThat(authors.size(), is(greaterThan(0)));
-        return new Anthology(
-                authors.get(0).getId(),
-                Book.Location.OTHER,
-                "Notes about New Anthology",
-                true,
-                "New Anthology");
+    private Book findFirstBook() throws Exception {
+        List<Book> books = bookClient.findAll();
+        return books.get(0);
+    }
+
+    private Story findFirstStory() throws Exception {
+        List<Story> Storys = storyClient.findAll();
+        assertThat(Storys.size(), is(greaterThan(0)));
+        return Storys.get(0);
+    }
+
+    private Story newStory() throws Exception {
+        return new Story(findFirstAnthology().getId(), findFirstBook().getId(), 123);
     }
 
 }
