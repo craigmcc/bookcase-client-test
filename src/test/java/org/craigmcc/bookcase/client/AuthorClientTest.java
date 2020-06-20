@@ -15,13 +15,13 @@
  */
 package org.craigmcc.bookcase.client;
 
-import org.craigmcc.bookcase.exception.BadRequest;
-import org.craigmcc.bookcase.exception.NotFound;
-import org.craigmcc.bookcase.exception.NotUnique;
 import org.craigmcc.bookcase.model.Anthology;
 import org.craigmcc.bookcase.model.Author;
 import org.craigmcc.bookcase.model.Book;
 import org.craigmcc.bookcase.model.Series;
+import org.craigmcc.library.shared.exception.BadRequest;
+import org.craigmcc.library.shared.exception.NotFound;
+import org.craigmcc.library.shared.exception.NotUnique;
 import org.junit.Before;
 import org.junit.Test;
 

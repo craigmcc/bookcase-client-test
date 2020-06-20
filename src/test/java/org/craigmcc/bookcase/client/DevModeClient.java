@@ -15,8 +15,8 @@
  */
 package org.craigmcc.bookcase.client;
 
-import org.craigmcc.bookcase.exception.Forbidden;
-import org.craigmcc.bookcase.exception.InternalServerError;
+import org.craigmcc.library.shared.exception.Forbidden;
+import org.craigmcc.library.shared.exception.InternalServerError;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;

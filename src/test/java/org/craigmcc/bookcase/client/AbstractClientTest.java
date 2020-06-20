@@ -15,8 +15,8 @@
  */
 package org.craigmcc.bookcase.client;
 
-import org.craigmcc.bookcase.exception.Forbidden;
-import org.craigmcc.bookcase.exception.InternalServerError;
+import org.craigmcc.library.shared.exception.Forbidden;
+import org.craigmcc.library.shared.exception.InternalServerError;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
