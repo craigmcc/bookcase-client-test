@@ -218,18 +218,18 @@ public class StoryClientTest extends AbstractClientTest {
         Story original = findFirstStory();
 
         // Update this entity
-        Story Story = original.clone();
+        Story story = original.clone();
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             /* Ignore */;
         }
-        Story.setOrdinal(Story.getOrdinal() + 100);
-        Story updated = storyClient.update(Story);
+        story.setOrdinal(story.getOrdinal() + 100);
+        Story updated = storyClient.update(story.getId(), story);
 
         // Validate this entity
-        assertThat(updated.getId(), is(Story.getId()));
-        assertThat(updated.getPublished(), is(Story.getPublished()));
+        assertThat(updated.getId(), is(story.getId()));
+        assertThat(updated.getPublished(), is(story.getPublished()));
         assertThat(updated.getUpdated(), is(greaterThan(original.getUpdated())));
         assertThat(updated.getVersion(), is(greaterThan(original.getVersion())));
         assertThat(updated.getOrdinal(), is(original.getOrdinal() + 100));
@@ -251,34 +251,29 @@ public class StoryClientTest extends AbstractClientTest {
             /* Ignore */;
         }
 
-        // Completely empty instance
-        final Story story0 = new Story();
-        assertThrows(NotFound.class,
-                () -> storyClient.update(story0));
-
         // Missing bookId field
         final Story story1 = original.clone();
         story1.setBookId(null);
         assertThrows(BadRequest.class,
-                () -> storyClient.update(story1));
+                () -> storyClient.update(story1.getId(), story1));
 
         // Invalid bookId field
         final Story story2 = original.clone();
         story2.setBookId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> storyClient.update(story2));
+                () -> storyClient.update(story2.getId(), story2));
 
         // Missing anthologyId field
         final Story story3 = original.clone();
         story3.setAnthologyId(null);
         assertThrows(BadRequest.class,
-                () -> storyClient.update(story3));
+                () -> storyClient.update(story3.getId(), story3));
 
         // Invalid anthologyId field
         final Story story4 = original.clone();
         story4.setAnthologyId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> storyClient.update(story4));
+                () -> storyClient.update(story4.getId(), story4));
 
     }
 

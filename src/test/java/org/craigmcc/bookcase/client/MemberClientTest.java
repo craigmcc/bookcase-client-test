@@ -225,7 +225,7 @@ public class MemberClientTest extends AbstractClientTest {
             /* Ignore */;
         }
         member.setOrdinal(member.getOrdinal() + 100);
-        Member updated = memberClient.update(member);
+        Member updated = memberClient.update(member.getId(), member);
 
         // Validate this entity
         assertThat(updated.getId(), is(member.getId()));
@@ -251,34 +251,29 @@ public class MemberClientTest extends AbstractClientTest {
             /* Ignore */;
         }
 
-        // Completely empty instance
-        final Member member0 = new Member();
-        assertThrows(NotFound.class,
-                () -> memberClient.update(member0));
-
         // Missing bookId field
         final Member member1 = original.clone();
         member1.setBookId(null);
         assertThrows(BadRequest.class,
-                () -> memberClient.update(member1));
+                () -> memberClient.update(member1.getId(), member1));
 
         // Invalid bookId field
         final Member member2 = original.clone();
         member2.setBookId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> memberClient.update(member2));
+                () -> memberClient.update(member2.getId(), member2));
 
         // Missing seriesId field
         final Member member3 = original.clone();
         member3.setSeriesId(null);
         assertThrows(BadRequest.class,
-                () -> memberClient.update(member3));
+                () -> memberClient.update(member3.getId(), member3));
 
         // Invalid seriesId field
         final Member member4 = original.clone();
         member4.setSeriesId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> memberClient.update(member4));
+                () -> memberClient.update(member4.getId(), member4));
 
     }
 

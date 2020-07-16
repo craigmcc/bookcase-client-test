@@ -233,18 +233,18 @@ public class AuthorClientTest extends AbstractClientTest {
         Author original = findFirstAuthorByName("Pebbles");
 
         // Update this entity
-        Author Author = original.clone();
+        Author author = original.clone();
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             /* Ignore */;
         }
-        Author.setFirstName(Author.getFirstName() + " Updated");
-        Author updated = authorClient.update(Author);
+        author.setFirstName(author.getFirstName() + " Updated");
+        Author updated = authorClient.update(author.getId(), author);
 
         // Validate this entity
-        assertThat(updated.getId(), is(Author.getId()));
-        assertThat(updated.getPublished(), is(Author.getPublished()));
+        assertThat(updated.getId(), is(author.getId()));
+        assertThat(updated.getPublished(), is(author.getPublished()));
         assertThat(updated.getUpdated(), is(greaterThan(original.getUpdated())));
         assertThat(updated.getVersion(), is(greaterThan(original.getVersion())));
         assertThat(updated.getFirstName(), is(original.getFirstName() + " Updated"));
@@ -267,22 +267,17 @@ public class AuthorClientTest extends AbstractClientTest {
             /* Ignore */;
         }
 
-        // Completely empty instance
-        final Author author0 = new Author();
-        assertThrows(NotFound.class,
-                () -> authorClient.update(author0));
-
         // Missing firstName field
         final Author author1 = original.clone();
         author1.setFirstName(null);
         assertThrows(BadRequest.class,
-                () -> authorClient.update(author1));
+                () -> authorClient.update(author1.getId(), author1));
 
         // Missing lastName field
         final Author author2 = original.clone();
-        author1.setLastName(null);
+        author2.setLastName(null);
         assertThrows(BadRequest.class,
-                () -> authorClient.update(author1));
+                () -> authorClient.update(author2.getId(), author2));
 
     }
 
@@ -297,7 +292,7 @@ public class AuthorClientTest extends AbstractClientTest {
         author.setFirstName("Barney");
         author.setLastName("Rubble");
         assertThrows(NotUnique.class,
-                () -> authorClient.update(author));
+                () -> authorClient.update(author.getId(), author));
 
     }
 

@@ -73,24 +73,27 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
+            <version>${jersey.version}</version>
         </dependency>
 
         <!-- Jersey JAX-RS Dependency Injection Module -->
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
         </dependency>
 
         <!-- Jersey JAX-RS Jackson JSON Provider -->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
         </dependency>
 
         <!-- Hamcrest Matchers for tests -->
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>java-hamcrest</artifactId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -98,6 +101,7 @@
 
     <properties>
         <bookcase-client.version>1.0.0-SNAPSHOT</bookcase-client.version>
+        <jersey.version>2.31</jersey.version>  <!-- Jersey versions must all match -->
         <shared.version>1.0.0-SNAPSHOT</shared.version>
     </properties>
 

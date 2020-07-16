@@ -223,18 +223,18 @@ public class BookClientTest extends AbstractClientTest {
         Book original = findFirstBookByTitle("by");
 
         // Update this entity
-        Book Book = original.clone();
+        Book book = original.clone();
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             /* Ignore */;
         }
-        Book.setTitle(Book.getTitle() + " Updated");
-        Book updated = bookClient.update(Book);
+        book.setTitle(book.getTitle() + " Updated");
+        Book updated = bookClient.update(book.getId(), book);
 
         // Validate this entity
-        assertThat(updated.getId(), is(Book.getId()));
-        assertThat(updated.getPublished(), is(Book.getPublished()));
+        assertThat(updated.getId(), is(book.getId()));
+        assertThat(updated.getPublished(), is(book.getPublished()));
         assertThat(updated.getUpdated(), is(greaterThan(original.getUpdated())));
         assertThat(updated.getVersion(), is(greaterThan(original.getVersion())));
         assertThat(updated.getTitle(), is(original.getTitle() + " Updated"));
@@ -256,28 +256,23 @@ public class BookClientTest extends AbstractClientTest {
             /* Ignore */;
         }
 
-        // Completely empty instance
-        final Book book0 = new Book();
-        assertThrows(NotFound.class,
-                () -> bookClient.update(book0));
-
         // Missing authorId field
         final Book book1 = original.clone();
         book1.setAuthorId(null);
         assertThrows(BadRequest.class,
-                () -> bookClient.update(book1));
+                () -> bookClient.update(book1.getId(), book1));
 
         // Invalid authorId field
         final Book book2 = original.clone();
         book2.setAuthorId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> bookClient.update(book1));
+                () -> bookClient.update(book2.getId(), book2));
 
         // Missing title field
         final Book book3 = original.clone();
         book3.setTitle(null);
         assertThrows(BadRequest.class,
-                () -> bookClient.update(book3));
+                () -> bookClient.update(book3.getId(), book3));
 
     }
 
